@@ -9,30 +9,50 @@ export default function LoginPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleAuth = async () => {
-    try {
-      setLoading(true);
-      setMessage('');
+  const handleAuth = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    setLoading(true);
 
+    try {
       if (isSignup) {
+        if (!name.trim()) {
+          throw new Error('Name is required.');
+        }
+
         const result = await createUserWithEmailAndPassword(auth, email, password);
         await setDoc(doc(db, 'users', result.user.uid), {
           uid: result.user.uid,
-          name: name || 'New User',
+          name,
           email,
           role,
           createdAt: new Date().toISOString(),
         });
-        setMessage('Account created successfully.');
+        setSuccess(`Account created! Welcome, ${name}. You can now log in.`);
+        setName('');
+        setEmail('');
+        setPassword('');
       } else {
         await signInWithEmailAndPassword(auth, email, password);
-        setMessage('Login successful.');
+        setSuccess('Logged in successfully!');
       }
-    } catch (error) {
-      setMessage(error.message);
+    } catch (err) {
+      let errorMsg = err.message;
+      if (err.code === 'auth/email-already-in-use') {
+        errorMsg = 'This email is already in use.';
+      } else if (err.code === 'auth/weak-password') {
+        errorMsg = 'Password should be at least 6 characters.';
+      } else if (err.code === 'auth/user-not-found') {
+        errorMsg = 'No account found with this email.';
+      } else if (err.code === 'auth/wrong-password') {
+        errorMsg = 'Incorrect password.';
+      }
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -42,19 +62,27 @@ export default function LoginPage() {
     <div className="login-wrap">
       <div className="card login-card">
         <h1 className="login-title">Homework Portal</h1>
-        <p className="login-subtitle">Teacher and student access in one place.</p>
+        <p className="login-subtitle">{isSignup ? 'Create your account' : 'Sign in to your account'}</p>
 
-        {message && <div className="alert">{message}</div>}
+        {error && <div className="alert" style={{ backgroundColor: '#fee', color: '#991' }}>{error}</div>}
+        {success && <div className="alert">{success}</div>}
 
-        <div className="form-grid">
+        <form onSubmit={handleAuth} className="form-grid">
           {isSignup && (
             <>
               <div>
                 <label className="label">Full Name</label>
-                <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter your name" />
+                <input
+                  className="input"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter your name"
+                  required
+                />
               </div>
               <div>
-                <label className="label">Role</label>
+                <label className="label">I am a</label>
                 <select className="select" value={role} onChange={(e) => setRole(e.target.value)}>
                   <option value="student">Student</option>
                   <option value="teacher">Teacher</option>
@@ -64,24 +92,46 @@ export default function LoginPage() {
           )}
 
           <div>
-            <label className="label">Email</label>
-            <input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
+            <label className="label">Email Address</label>
+            <input
+              className="input"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
+            />
           </div>
 
           <div>
             <label className="label">Password</label>
-            <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter password" />
+            <input
+              className="input"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              required
+            />
           </div>
 
           <div className="form-actions">
-            <button className="btn btn-primary" onClick={handleAuth} disabled={loading}>
-              {loading ? 'Please wait...' : isSignup ? 'Create Account' : 'Login'}
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+              {loading ? 'Loading...' : isSignup ? 'Create Account' : 'Sign In'}
             </button>
-            <button className="btn btn-secondary" onClick={() => setIsSignup(!isSignup)}>
-              {isSignup ? 'Already have account?' : 'Create account'}
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => {
+                setIsSignup(!isSignup);
+                setError('');
+                setSuccess('');
+              }}
+            >
+              {isSignup ? 'Have an account?' : 'Need an account?'}
             </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );
