@@ -9,6 +9,7 @@ import StudentDashboard from './pages/StudentDashboard';
 export default function App() {
   const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,11 +17,25 @@ export default function App() {
       setUser(currentUser);
 
       if (currentUser) {
-        const userRef = doc(db, 'users', currentUser.uid);
-        const userSnap = await getDoc(userRef);
-        setUserRole(userSnap.exists() ? userSnap.data().role : 'student');
+        try {
+          const userRef = doc(db, 'users', currentUser.uid);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            const userData = userSnap.data();
+            setUserRole(userData.role || 'student');
+            setUserName(userData.name || 'User');
+          } else {
+            setUserRole('student');
+            setUserName('User');
+          }
+        } catch (err) {
+          console.error('Error fetching user data:', err);
+          setUserRole('student');
+          setUserName('User');
+        }
       } else {
         setUserRole(null);
+        setUserName('');
       }
 
       setLoading(false);
@@ -30,7 +45,15 @@ export default function App() {
   }, []);
 
   if (loading) {
-    return <div className="login-wrap"><div className="card login-card">Loading...</div></div>;
+    return (
+      <div className="login-wrap">
+        <div className="card login-card" style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '2rem', marginBottom: 16 }}>📚</div>
+          <h2>Loading...</h2>
+          <p className="muted">Initializing your homework portal</p>
+        </div>
+      </div>
+    );
   }
 
   if (!user) {
@@ -41,16 +64,22 @@ export default function App() {
     <div className="app-shell">
       <div className="container">
         <header className="card topbar">
-          <div className="brand">Homework Portal</div>
+          <div className="brand">📚 Homework Portal</div>
           <div className="header-actions">
-            <span className="user-pill">{userRole === 'teacher' ? 'Teacher' : 'Student'}</span>
+            <span className="user-pill">
+              {userRole === 'teacher' ? '👨‍🏫 Teacher' : '👨‍🎓 Student'} • {userName}
+            </span>
             <button className="btn btn-secondary" onClick={() => signOut(auth)}>
               Logout
             </button>
           </div>
         </header>
 
-        {userRole === 'teacher' ? <TeacherDashboard uid={user.uid} email={user.email} /> : <StudentDashboard uid={user.uid} email={user.email} />}
+        {userRole === 'teacher' ? (
+          <TeacherDashboard uid={user.uid} email={user.email} userName={userName} />
+        ) : (
+          <StudentDashboard uid={user.uid} email={user.email} userName={userName} />
+        )}
       </div>
     </div>
   );
