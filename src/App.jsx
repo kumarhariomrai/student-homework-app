@@ -1,530 +1,103 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
-
-:root {
-  --primary: #f59e0b;
-  --primary-dark: #d97706;
-  --primary-light: #fcd34d;
-  --secondary: #1e40af;
-  --secondary-dark: #1e3a8a;
-  --accent: #7c3aed;
-  --success: #10b981;
-  --danger: #ef4444;
-  --warning: #f97316;
-  --info: #06b6d4;
-  --bg: #f8fafc;
-  --bg-dark: #0f172a;
-  --card: #ffffff;
-  --text: #1f2937;
-  --text-light: #6b7280;
-  --border: #e5e7eb;
-  --border-light: #f3f4f6;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  background: linear-gradient(135deg, #f0f9ff 0%, #fef3c7 50%, #f0fdf4 100%);
-  color: var(--text);
-  min-height: 100vh;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
-
-.app-shell {
-  min-height: 100vh;
-  padding: 24px 16px;
-}
-
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
-}
-
-.card:hover {
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
-}
-
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px;
-  margin-bottom: 32px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-  border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
-}
-
-.brand-wrap {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.brand-logo {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-  border-radius: 12px;
-  padding: 8px;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-}
-
-.brand-name {
-  font-size: 1.5rem;
-  font-weight: 800;
-  line-height: 1.2;
-  color: white;
-  font-family: 'Poppins', sans-serif;
-}
-
-.brand-subtitle {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.8rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-weight: 600;
-}
-
-.brand-text {
-  display: grid;
-  gap: 4px;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.user-pill {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border-radius: 999px;
-  padding: 10px 18px;
-  font-weight: 600;
-  font-size: 0.92rem;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.logo-wrap {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 24px;
-}
-
-.logo-wrap.large .brand-logo {
-  width: 100px;
-  height: 100px;
-  padding: 12px;
-}
-
-.btn {
-  border: none;
-  cursor: pointer;
-  border-radius: 12px;
-  padding: 12px 20px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  font-size: 0.95rem;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
-}
-
-.btn-secondary {
-  background: var(--bg);
-  color: var(--text);
-  border: 1px solid var(--border);
-}
-
-.btn-secondary:hover {
-  background: var(--border-light);
-}
-
-.btn-danger {
-  background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.form-grid {
-  display: grid;
-  gap: 16px;
-}
-
-.row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.label {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: var(--text);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.input,
-.select,
-.textarea {
-  width: 100%;
-  border: 2px solid var(--border);
-  background: var(--bg);
-  color: var(--text);
-  border-radius: 12px;
-  padding: 12px 14px;
-  outline: none;
-  transition: all 0.3s ease;
-  font-size: 0.95rem;
-}
-
-.input:focus,
-.select:focus,
-.textarea:focus {
-  border-color: var(--primary);
-  background: white;
-  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
-}
-
-.textarea {
-  min-height: 120px;
-  resize: vertical;
-  font-family: 'Inter', sans-serif;
-}
-
-.list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 14px;
-}
-
-.list-item {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--border-light) 100%);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 18px;
-  transition: all 0.3s ease;
-}
-
-.list-item:hover {
-  border-color: var(--primary);
-  transform: translateX(4px);
-}
-
-.hstack {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.muted {
-  color: var(--text-light);
-  font-size: 0.9rem;
-}
-
-.badge {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
-  color: var(--success);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.empty-state {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--border-light) 100%);
-  border: 2px dashed var(--border);
-  border-radius: 12px;
-  padding: 32px 24px;
-  color: var(--text-light);
-  text-align: center;
-}
-
-.alert {
-  background: linear-gradient(135deg, rgba(30, 64, 175, 0.05) 0%, rgba(30, 64, 175, 0.02) 100%);
-  color: var(--secondary-dark);
-  border: 1px solid rgba(30, 64, 175, 0.2);
-  border-radius: 12px;
-  padding: 14px 16px;
-  font-weight: 600;
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-}
-
-.alert-error {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(239, 68, 68, 0.02) 100%);
-  color: #991b1b;
-  border-color: rgba(239, 68, 68, 0.2);
-}
-
-.login-wrap {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-}
-
-.login-card {
-  width: min(480px, 100%);
-  padding: 40px 32px;
-}
-
-.login-title {
-  margin: 16px 0 8px;
-  font-size: 2.2rem;
-  text-align: center;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.login-subtitle {
-  margin: 0 0 28px;
-  color: var(--text-light);
-  text-align: center;
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-.form-actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.dashboard-shell {
-  display: grid;
-  gap: 28px;
-}
-
-.dashboard-header {
-  display: grid;
-  gap: 20px;
-}
-
-.dashboard-header > div:first-child {
-  display: grid;
-  gap: 8px;
-}
-
-.eyebrow {
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-weight: 700;
-  color: var(--primary);
-  font-size: 0.72rem;
-}
-
-.dashboard-header h2 {
-  margin: 0;
-  font-size: 2.4rem;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.tab-group {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  background: var(--bg);
-  padding: 8px;
-  border-radius: 12px;
-  width: fit-content;
-}
-
-.tab-btn {
-  border: none;
-  background: transparent;
-  color: var(--text-light);
-  border-radius: 8px;
-  padding: 10px 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.9rem;
-}
-
-.tab-btn:hover {
-  color: var(--primary);
-}
-
-.tab-btn.active {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-}
-
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 28px;
-}
-
-.panel {
-  padding: 28px;
-}
-
-.panel h3 {
-  margin: 0 0 20px;
-  font-size: 1.3rem;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.stat-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
-  margin-bottom: 28px;
-}
-
-.stat-card {
-  padding: 24px;
-  display: grid;
-  gap: 12px;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, rgba(30, 64, 175, 0.05) 100%);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  transition: all 0.3s ease;
-}
-
-.stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.2);
-}
-
-.stat-card span {
-  color: var(--text-light);
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.stat-card strong {
-  font-size: 2rem;
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.notice-item {
-  border-left: 4px solid var(--warning);
-  background: linear-gradient(135deg, rgba(249, 115, 22, 0.05) 0%, transparent 100%);
-}
-
-.notice-item:hover {
-  border-left-color: var(--primary);
-}
-
-.form-card {
-  padding: 28px;
-}
-
-.form-card h3 {
-  margin: 0 0 20px;
-  font-size: 1.3rem;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
-  color: var(--text);
-}
-
-@media (max-width: 1024px) {
-  .stat-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 768px) {
-  .dashboard-grid,
-  .row,
-  .stat-grid {
-    grid-template-columns: 1fr;
+import { useEffect, useState } from 'react';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from './firebase/config';
+import LoginPage from './pages/LoginPage';
+import TeacherDashboard from './pages/TeacherDashboard';
+import StudentDashboard from './pages/StudentDashboard';
+import ParentDashboard from './pages/ParentDashboard';
+
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+  const [userName, setUserName] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+
+      if (currentUser) {
+        try {
+          const userRef = doc(db, 'users', currentUser.uid);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            const userData = userSnap.data();
+            setUserRole(userData.role || 'student');
+            setUserName(userData.name || 'User');
+          } else {
+            setUserRole('student');
+            setUserName('User');
+          }
+        } catch (err) {
+          console.error('Error fetching user data:', err);
+          setUserRole('student');
+          setUserName('User');
+        }
+      } else {
+        setUserRole(null);
+        setUserName('');
+      }
+
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="login-wrap">
+        <div className="card login-card" style={{ textAlign: 'center' }}>
+          <div className="logo-wrap large">
+            <img src="/logo.svg" alt="Sunbeam Convent School logo" className="brand-logo" />
+          </div>
+          <h2>Loading...</h2>
+          <p className="muted">Initializing Sunbeam Convent School portal</p>
+        </div>
+      </div>
+    );
   }
 
-  .topbar {
-    flex-direction: column;
-    gap: 16px;
-    align-items: flex-start;
+  if (!user) {
+    return <LoginPage />;
   }
 
-  .header-actions {
-    width: 100%;
-    justify-content: space-between;
-  }
+  const roleLabel = userRole === 'teacher' ? 'Teacher' : userRole === 'parent' ? 'Parent' : 'Student';
 
-  .dashboard-header {
-    align-items: start;
-  }
+  return (
+    <div className="app-shell">
+      <div className="container">
+        <header className="card topbar">
+          <div className="brand-wrap">
+            <img src="/logo.svg" alt="Sunbeam Convent School logo" className="brand-logo" />
+            <div className="brand-text">
+              <div className="brand-name">Sunbeam Convent School</div>
+              <div className="brand-subtitle">Learning Portal</div>
+            </div>
+          </div>
+          <div className="header-actions">
+            <span className="user-pill">
+              {roleLabel} • {userName}
+            </span>
+            <button className="btn btn-secondary" onClick={() => signOut(auth)}>
+              Logout
+            </button>
+          </div>
+        </header>
 
-  .login-card {
-    padding: 32px 24px;
-  }
+        {userRole === 'teacher' && (
+          <TeacherDashboard uid={user.uid} email={user.email} userName={userName} />
+        )}
 
-  .login-title {
-    font-size: 1.8rem;
-  }
+        {userRole === 'student' && (
+          <StudentDashboard uid={user.uid} email={user.email} userName={userName} />
+        )}
+
+        {userRole === 'parent' && (
+          <ParentDashboard uid={user.uid} email={user.email} userName={userName} />
+        )}
+      </div>
+    </div>
+  );
 }
