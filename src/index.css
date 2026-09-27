@@ -1,126 +1,142 @@
-import { useEffect, useState } from 'react';
-import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { useState } from 'react';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase/config';
 
-export default function ParentDashboard({ uid, email, userName }) {
-  const [students, setStudents] = useState([]);
-  const [grades, setGrades] = useState([]);
-  const [materials, setMaterials] = useState([]);
-  const [notices, setNotices] = useState([]);
+export default function LoginPage() {
+  const [isSignup, setIsSignup] = useState(false);
+  const [role, setRole] = useState('student');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const studentQuery = query(collection(db, 'users'));
-    const unsubStudents = onSnapshot(studentQuery, (snapshot) => {
-      const studentList = snapshot.docs
-        .map((doc) => ({ id: doc.id, ...doc.data() }))
-        .filter((item) => item.role === 'student');
-      setStudents(studentList);
-    });
+  const handleAuth = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    setLoading(true);
 
-    const gradesQuery = query(collection(db, 'grades'), orderBy('createdAt', 'desc'));
-    const unsubGrades = onSnapshot(gradesQuery, (snapshot) => {
-      setGrades(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-    });
+    try {
+      if (isSignup) {
+        if (!name.trim()) {
+          throw new Error('Name is required.');
+        }
 
-    const materialsQuery = query(collection(db, 'materials'), orderBy('createdAt', 'desc'));
-    const unsubMaterials = onSnapshot(materialsQuery, (snapshot) => {
-      setMaterials(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-    });
-
-    const noticesQuery = query(collection(db, 'notices'), orderBy('createdAt', 'desc'));
-    const unsubNotices = onSnapshot(noticesQuery, (snapshot) => {
-      setNotices(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-    });
-
-    return () => {
-      unsubStudents();
-      unsubGrades();
-      unsubMaterials();
-      unsubNotices();
-    };
-  }, []);
-
-  const studentAverage = (studentId) => {
-    const list = grades.filter((g) => g.studentId === studentId && Number.isFinite(Number(g.score)));
-    if (!list.length) return '—';
-    const avg = list.reduce((sum, item) => sum + Number(item.score), 0) / list.length;
-    return `${avg.toFixed(1)}%`;
+        const result = await createUserWithEmailAndPassword(auth, email, password);
+        await setDoc(doc(db, 'users', result.user.uid), {
+          uid: result.user.uid,
+          name,
+          email,
+          role,
+          createdAt: new Date().toISOString(),
+        });
+        setSuccess(`Account created! Welcome, ${name}.`);
+        setName('');
+        setEmail('');
+        setPassword('');
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+        setSuccess('Logged in successfully!');
+      }
+    } catch (err) {
+      let errorMsg = err.message;
+      if (err.code === 'auth/email-already-in-use') {
+        errorMsg = 'This email is already in use.';
+      } else if (err.code === 'auth/weak-password') {
+        errorMsg = 'Password should be at least 6 characters.';
+      } else if (err.code === 'auth/user-not-found') {
+        errorMsg = 'No account found with this email.';
+      } else if (err.code === 'auth/wrong-password') {
+        errorMsg = 'Incorrect password.';
+      }
+      setError(errorMsg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="dashboard-shell">
-      <div className="dashboard-header">
-        <div>
-          <p className="eyebrow">Parent portal</p>
-          <h2>Student Progress</h2>
+    <div className="login-wrap">
+      <div className="card login-card">
+        <div className="logo-wrap">
+          <img src="/logo.svg" alt="Sunbeam Convent School logo" className="brand-logo" />
         </div>
-      </div>
+        <h1 className="login-title">Sunbeam Convent School</h1>
+        <p className="login-subtitle">Teacher, student, and parent portal.</p>
 
-      <div className="dashboard-grid">
-        <div className="card panel">
-          <h3>Academic Overview</h3>
-          {students.length === 0 ? (
-            <div className="empty-state">No students available.</div>
-          ) : (
-            <ul className="list">
-              {students.map((student) => (
-                <li key={student.id} className="list-item">
-                  <div className="hstack">
-                    <strong>{student.name}</strong>
-                    <span className="badge">Avg: {studentAverage(student.id)}</span>
-                  </div>
-                  <div className="muted">{student.email}</div>
-                  <div className="muted">
-                    Recent marks: {grades.filter((g) => g.studentId === student.id).slice(0, 3).map((g) => `${g.subject}: ${g.score}`).join(' • ') || 'No grades yet'}
-                  </div>
-                </li>
-              ))}
-            </ul>
+        {error && <div className="alert alert-error">{error}</div>}
+        {success && <div className="alert">{success}</div>}
+
+        <form onSubmit={handleAuth} className="form-grid">
+          {isSignup && (
+            <>
+              <div>
+                <label className="label">Full Name</label>
+                <input
+                  className="input"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter your name"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="label">Role</label>
+                <select className="select" value={role} onChange={(e) => setRole(e.target.value)}>
+                  <option value="student">Student</option>
+                  <option value="teacher">Teacher</option>
+                  <option value="parent">Parent</option>
+                </select>
+              </div>
+            </>
           )}
-        </div>
 
-        <div className="card panel">
-          <h3>Download Center</h3>
-          {materials.length === 0 ? (
-            <div className="empty-state">No materials shared yet.</div>
-          ) : (
-            <ul className="list">
-              {materials.map((item) => (
-                <li key={item.id} className="list-item">
-                  <div className="hstack">
-                    <strong>{item.title}</strong>
-                    <span className="badge">{item.type}</span>
-                  </div>
-                  <div className="muted">{item.description}</div>
-                  {item.fileUrl && (
-                    <a href={item.fileUrl} target="_blank" rel="noreferrer">
-                      <button className="btn btn-secondary" style={{ marginTop: 8 }}>Download</button>
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
+          <div>
+            <label className="label">Email Address</label>
+            <input
+              className="input"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
+            />
+          </div>
 
-      <div className="card panel" style={{ marginTop: 24 }}>
-        <h3>Announcements</h3>
-        {notices.length === 0 ? (
-          <div className="empty-state">No school notices yet.</div>
-        ) : (
-          <ul className="list">
-            {notices.map((notice) => (
-              <li key={notice.id} className="list-item notice-item">
-                <div className="hstack">
-                  <strong>{notice.title}</strong>
-                </div>
-                <div className="muted">{notice.content}</div>
-                <div className="muted">Posted by {notice.createdByName}</div>
-              </li>
-            ))}
-          </ul>
-        )}
+          <div>
+            <label className="label">Password</label>
+            <input
+              className="input"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+              required
+            />
+          </div>
+
+          <div className="form-actions">
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+              {loading ? 'Loading...' : isSignup ? 'Create Account' : 'Sign In'}
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => {
+                setIsSignup(!isSignup);
+                setError('');
+                setSuccess('');
+              }}
+            >
+              {isSignup ? 'Already have an account?' : 'Need an account?'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

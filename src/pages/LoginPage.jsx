@@ -49,9 +49,11 @@ export default function App() {
     return (
       <div className="login-wrap">
         <div className="card login-card" style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', marginBottom: 16 }}>📚</div>
+          <div className="logo-wrap large">
+            <img src="/logo.svg" alt="Sunbeam Convent School logo" className="brand-logo" />
+          </div>
           <h2>Loading...</h2>
-          <p className="muted">Initializing your school portal</p>
+          <p className="muted">Initializing Sunbeam Convent School portal</p>
         </div>
       </div>
     );
@@ -67,7 +69,13 @@ export default function App() {
     <div className="app-shell">
       <div className="container">
         <header className="card topbar">
-          <div className="brand">🎓 School Hub</div>
+          <div className="brand-wrap">
+            <img src="/logo.svg" alt="Sunbeam Convent School logo" className="brand-logo" />
+            <div className="brand-text">
+              <div className="brand-name">Sunbeam Convent School</div>
+              <div className="brand-subtitle">Learning Portal</div>
+            </div>
+          </div>
           <div className="header-actions">
             <span className="user-pill">{roleLabel} • {userName}</span>
             <button className="btn btn-secondary" onClick={() => signOut(auth)}>
