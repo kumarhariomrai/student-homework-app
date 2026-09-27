@@ -1,392 +1,118 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+# Sunbeam Convent School - Learning Portal
 
-:root {
-  --bg: #f5f7fb;
-  --card: #ffffff;
-  --primary: #2563eb;
-  --primary-dark: #1d4ed8;
-  --success: #16a34a;
-  --text: #0f172a;
-  --muted: #475569;
-  --border: #dfe7f5;
-  --danger: #dc2626;
-  --warning: #f59e0b;
-}
+**Learning With Light** ✨
 
-* {
-  box-sizing: border-box;
-}
+A modern, zero-cost Learning Management System (LMS) built for teachers, students, and parents.
 
-body {
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  background: linear-gradient(135deg, #eef4ff 0%, #f8fafc 100%);
-  color: var(--text);
-}
+## Features
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+### 👨‍🏫 Teacher Dashboard
+- **Grade Management**: Log and track student marks easily
+- **Material Sharing**: Upload lecture slides, PDFs, and homework sheets
+- **Digital Noticeboard**: Publish announcements and important dates
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
+### 🎓 Student Portal
+- **Progress Tracker**: View grades, averages, and teacher feedback
+- **Download Center**: Access study materials and assignments
+- **Announcement Feed**: Stay updated with school notices
 
-.app-shell {
-  min-height: 100vh;
-  padding: 32px 20px;
-}
+### 👨‍👩‍👧 Parent Portal
+- **Academic Overview**: Monitor student progress and grades
+- **Material Access**: Download study materials
+- **School Notices**: Receive important announcements
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-}
+## Tech Stack
 
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
-}
+- **Frontend**: React + Vite
+- **Auth**: Firebase Authentication
+- **Database**: Firestore
+- **Storage**: Firebase Cloud Storage
+- **Hosting**: Vercel
+- **Design**: Premium gradient UI with Poppins typography
 
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 24px;
-  margin-bottom: 24px;
-}
+## Zero-Cost Setup
 
-.brand-wrap {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+This app runs completely free on:
+- Firebase free tier (auth, database, storage)
+- Vercel free hosting
+- Total cost: **$0/month** for ~100 students
 
-.brand-logo {
-  width: 54px;
-  height: 54px;
-  object-fit: contain;
-  border-radius: 14px;
-  padding: 6px;
-  background: linear-gradient(135deg, #e0edff, #fef3c7);
-}
+## Quick Start
 
-.brand-name {
-  font-size: 1.35rem;
-  font-weight: 800;
-  line-height: 1.2;
-}
+```bash
+npm install
+npm run dev
+```
 
-.brand-subtitle {
-  color: var(--muted);
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
+Then open http://localhost:5173
 
-.brand-text {
-  display: grid;
-  gap: 2px;
-}
+## Deployment
 
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+```bash
+npm run build
+# Deploy to Vercel
+vercel
+```
 
-.user-pill {
-  background: #eff6ff;
-  color: var(--primary-dark);
-  border-radius: 999px;
-  padding: 8px 14px;
-  font-weight: 600;
-  font-size: 0.92rem;
-}
+## Database Schema
 
-.logo-wrap {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 14px;
-}
+### Users
+```
+users/{userId}
+├── name: string
+├── email: string
+├── role: "student" | "teacher" | "parent"
+└── createdAt: timestamp
+```
 
-.logo-wrap.large .brand-logo {
-  width: 80px;
-  height: 80px;
-}
+### Grades
+```
+grades/{gradeId}
+├── studentId: string
+├── subject: string
+├── score: number (0-100)
+├── remark: string
+└── createdAt: timestamp
+```
 
-.btn {
-  border: none;
-  cursor: pointer;
-  border-radius: 12px;
-  padding: 12px 18px;
-  font-weight: 700;
-  transition: 0.2s ease;
-}
+### Materials
+```
+materials/{materialId}
+├── title: string
+├── description: string
+├── type: "PDF" | "Lecture" | "Slides" | "Homework"
+├── fileUrl: string
+└── createdAt: timestamp
+```
 
-.btn-primary {
-  background: var(--primary);
-  color: #fff;
-}
+### Notices
+```
+notices/{noticeId}
+├── title: string
+├── content: string
+├── createdByName: string
+└── createdAt: timestamp
+```
 
-.btn-primary:hover {
-  background: var(--primary-dark);
-}
+## Firebase Setup
 
-.btn-secondary {
-  background: #e2e8f0;
-  color: var(--text);
-}
+See `FIREBASE_SETUP.md` for detailed instructions.
 
-.btn-danger {
-  background: var(--danger);
-  color: white;
-}
+## Security Rules
 
-.page {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 24px;
-}
+See `SECURITY_RULES.md` for Firestore and Storage rules.
 
-.form-card,
-.panel {
-  padding: 24px;
-}
+## Brand
 
-.form-grid {
-  display: grid;
-  gap: 16px;
-}
+- **School Name**: Sunbeam Convent School
+- **Tagline**: Learning With Light
+- **Primary Color**: Golden (#f59e0b)
+- **Secondary Color**: Navy Blue (#1e40af)
 
-.row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
+## License
 
-.label {
-  display: block;
-  font-size: 0.86rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: var(--muted);
-}
+MIT
 
-.input,
-.select,
-.textarea {
-  width: 100%;
-  border: 1px solid var(--border);
-  background: #fbfdff;
-  color: var(--text);
-  border-radius: 12px;
-  padding: 12px 14px;
-  outline: none;
-}
+## Support
 
-.input:focus,
-.select:focus,
-.textarea:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-}
-
-.textarea {
-  min-height: 110px;
-  resize: vertical;
-}
-
-.list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 12px;
-}
-
-.list-item {
-  background: #f8fafc;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-}
-
-.hstack {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-
-.muted {
-  color: var(--muted);
-}
-
-.badge {
-  display: inline-block;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  background: #ecfdf5;
-  color: #166534;
-}
-
-.empty-state {
-  background: #f8fafc;
-  border: 1px dashed var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  color: var(--muted);
-}
-
-.alert {
-  background: #eff6ff;
-  color: #1d4ed8;
-  border: 1px solid #bfdbfe;
-  border-radius: 12px;
-  padding: 12px 14px;
-  font-weight: 600;
-}
-
-.alert-error {
-  background: #fef2f2;
-  color: #991b1b;
-  border-color: #fecaca;
-}
-
-.login-wrap {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-}
-
-.login-card {
-  width: min(460px, 100%);
-  padding: 28px;
-}
-
-.login-title {
-  margin: 0 0 6px;
-  font-size: 2rem;
-  text-align: center;
-}
-
-.login-subtitle {
-  margin: 0 0 20px;
-  color: var(--muted);
-  text-align: center;
-}
-
-.form-actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.dashboard-shell {
-  display: grid;
-  gap: 24px;
-}
-
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-}
-
-.eyebrow {
-  margin: 0 0 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-weight: 700;
-  color: var(--primary);
-  font-size: 0.72rem;
-}
-
-.dashboard-header h2 {
-  margin: 0;
-  font-size: 2rem;
-}
-
-.tab-group {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.tab-btn {
-  border: 1px solid var(--border);
-  background: white;
-  color: var(--text);
-  border-radius: 999px;
-  padding: 9px 16px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.tab-btn.active {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
-}
-
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
-}
-
-.stat-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.stat-card {
-  padding: 20px 18px;
-  display: grid;
-  gap: 8px;
-}
-
-.stat-card span {
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.stat-card strong {
-  font-size: 1.8rem;
-}
-
-.notice-item {
-  border-left: 4px solid var(--warning);
-}
-
-@media (max-width: 900px) {
-  .dashboard-grid,
-  .page,
-  .stat-grid,
-  .row {
-    grid-template-columns: 1fr;
-  }
-
-  .topbar,
-  .dashboard-header {
-    display: grid;
-    gap: 12px;
-    align-items: start;
-  }
-
-  .header-actions,
-  .form-actions {
-    flex-wrap: wrap;
-  }
-}
+For issues or questions, refer to the documentation or create a GitHub issue.

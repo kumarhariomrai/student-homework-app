@@ -1,127 +1,102 @@
-# Student Homework App
+import { useEffect, useState } from 'react';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from './firebase/config';
+import LoginPage from './pages/LoginPage';
+import TeacherDashboard from './pages/TeacherDashboard';
+import StudentDashboard from './pages/StudentDashboard';
+import ParentDashboard from './pages/ParentDashboard';
 
-A zero-cost homework portal for teachers and students built with React + Firebase.
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+  const [userName, setUserName] = useState('');
+  const [loading, setLoading] = useState(true);
 
-## Features
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
 
-- Student login and signup
-- Teacher login and signup
-- Create homework assignments
-- Upload homework submissions as files
-- View submitted work
-- Uses Firebase free tier for auth, database, and storage
+      if (currentUser) {
+        try {
+          const userRef = doc(db, 'users', currentUser.uid);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            const userData = userSnap.data();
+            setUserRole(userData.role || 'student');
+            setUserName(userData.name || 'User');
+          } else {
+            setUserRole('student');
+            setUserName('User');
+          }
+        } catch (err) {
+          console.error('Error fetching user data:', err);
+          setUserRole('student');
+          setUserName('User');
+        }
+      } else {
+        setUserRole(null);
+        setUserName('');
+      }
 
-## Tech Stack
+      setLoading(false);
+    });
 
-- React
-- Vite
-- Firebase Authentication
-- Firestore
-- Firebase Storage
+    return () => unsubscribe();
+  }, []);
 
-## Prerequisites
-
-- Node.js 18+
-- A Firebase project
-- A browser
-
-## Firebase Setup
-
-1. Go to the Firebase Console.
-2. Create a new project.
-3. Enable:
-   - Authentication
-   - Firestore Database
-   - Storage
-4. In Authentication, enable Email/Password sign-in.
-5. In Firestore, create a database in test mode or secure mode.
-6. In Storage, create a default bucket.
-
-## Environment Variables
-
-Create a `.env` file in the project root with:
-
-```env
-VITE_FIREBASE_API_KEY=your_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
-```
-
-You can copy `.env.example` as a starting point.
-
-## Install and Run
-
-```bash
-npm install
-npm run dev
-```
-
-Then open the local URL shown in the terminal.
-
-## Firebase Security Rules (Recommended)
-
-### Firestore rules
-
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    match /assignments/{assignmentId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null && resource.data.createdBy == request.auth.uid;
-    }
-
-    match /submissions/{submissionId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null && request.resource.data.studentId == request.auth.uid;
-      allow update, delete: if request.auth != null && resource.data.studentId == request.auth.uid;
-    }
+  if (loading) {
+    return (
+      <div className="login-wrap">
+        <div className="card login-card" style={{ textAlign: 'center' }}>
+          <div className="logo-wrap large">
+            <img src="/logo.svg" alt="Sunbeam Convent School logo" className="brand-logo" />
+          </div>
+          <h2 style={{ margin: 0, marginTop: 16, color: 'var(--text)' }}>Loading...</h2>
+          <p className="muted" style={{ marginTop: 8 }}>Initializing your learning portal</p>
+        </div>
+      </div>
+    );
   }
-}
-```
 
-### Storage rules
-
-```javascript
-rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-    match /submissions/{userId}/{allPaths=**} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.uid == userId;
-    }
+  if (!user) {
+    return <LoginPage />;
   }
+
+  const roleLabel = userRole === 'teacher' ? 'Teacher' : userRole === 'parent' ? 'Parent' : 'Student';
+  const roleEmoji = userRole === 'teacher' ? '👨‍🏫' : userRole === 'parent' ? '👨‍👩‍👧' : '🎓';
+
+  return (
+    <div className="app-shell">
+      <div className="container">
+        <header className="card topbar">
+          <div className="brand-wrap">
+            <img src="/logo.svg" alt="Sunbeam Convent School logo" className="brand-logo" />
+            <div className="brand-text">
+              <div className="brand-name">Sunbeam Convent School</div>
+              <div className="brand-subtitle">Learning With Light</div>
+            </div>
+          </div>
+          <div className="header-actions">
+            <span className="user-pill">{roleEmoji} {roleLabel} • {userName}</span>
+            <button className="btn btn-secondary" onClick={() => signOut(auth)}>
+              Logout
+            </button>
+          </div>
+        </header>
+
+        {userRole === 'teacher' && (
+          <TeacherDashboard uid={user.uid} email={user.email} userName={userName} />
+        )}
+
+        {userRole === 'student' && (
+          <StudentDashboard uid={user.uid} email={user.email} userName={userName} />
+        )}
+
+        {userRole === 'parent' && (
+          <ParentDashboard uid={user.uid} email={user.email} userName={userName} />
+        )}
+      </div>
+    </div>
+  );
 }
-```
-
-## Usage
-
-### Teacher
-- Create an account with the role "Teacher"
-- Create assignments
-- View student submissions
-- Download submitted files
-
-### Student
-- Create an account with the role "Student"
-- View assigned homework
-- Upload answer files
-- See submission status
-
-## Cost
-
-This app is designed for the Firebase free tier and is suitable for a small app with around 100 students.
-
-## Notes
-
-- This is a prototype starter app.
-- For production, add admin controls, grading, notifications, and stronger role validation.
-- Do not keep production secrets in the frontend.
