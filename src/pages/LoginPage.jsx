@@ -1,137 +1,92 @@
-import { useState } from 'react';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase/config';
+import { useEffect, useState } from 'react';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from './firebase/config';
+import LoginPage from './pages/LoginPage';
+import TeacherDashboard from './pages/TeacherDashboard';
+import StudentDashboard from './pages/StudentDashboard';
+import ParentDashboard from './pages/ParentDashboard';
 
-export default function LoginPage() {
-  const [isSignup, setIsSignup] = useState(false);
-  const [role, setRole] = useState('student');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [loading, setLoading] = useState(false);
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+  const [userName, setUserName] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  const handleAuth = async (e) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-    setLoading(true);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
 
-    try {
-      if (isSignup) {
-        if (!name.trim()) {
-          throw new Error('Name is required.');
+      if (currentUser) {
+        try {
+          const userRef = doc(db, 'users', currentUser.uid);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            const userData = userSnap.data();
+            setUserRole(userData.role || 'student');
+            setUserName(userData.name || 'User');
+          } else {
+            setUserRole('student');
+            setUserName('User');
+          }
+        } catch (err) {
+          console.error('Error fetching user data:', err);
+          setUserRole('student');
+          setUserName('User');
         }
-
-        const result = await createUserWithEmailAndPassword(auth, email, password);
-        await setDoc(doc(db, 'users', result.user.uid), {
-          uid: result.user.uid,
-          name,
-          email,
-          role,
-          createdAt: new Date().toISOString(),
-        });
-        setSuccess(`Account created! Welcome, ${name}. You can now log in.`);
-        setName('');
-        setEmail('');
-        setPassword('');
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
-        setSuccess('Logged in successfully!');
+        setUserRole(null);
+        setUserName('');
       }
-    } catch (err) {
-      let errorMsg = err.message;
-      if (err.code === 'auth/email-already-in-use') {
-        errorMsg = 'This email is already in use.';
-      } else if (err.code === 'auth/weak-password') {
-        errorMsg = 'Password should be at least 6 characters.';
-      } else if (err.code === 'auth/user-not-found') {
-        errorMsg = 'No account found with this email.';
-      } else if (err.code === 'auth/wrong-password') {
-        errorMsg = 'Incorrect password.';
-      }
-      setError(errorMsg);
-    } finally {
+
       setLoading(false);
-    }
-  };
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="login-wrap">
+        <div className="card login-card" style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '2rem', marginBottom: 16 }}>📚</div>
+          <h2>Loading...</h2>
+          <p className="muted">Initializing your school portal</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <LoginPage />;
+  }
+
+  const roleLabel = userRole === 'teacher' ? 'Teacher' : userRole === 'parent' ? 'Parent' : 'Student';
 
   return (
-    <div className="login-wrap">
-      <div className="card login-card">
-        <h1 className="login-title">Homework Portal</h1>
-        <p className="login-subtitle">{isSignup ? 'Create your account' : 'Sign in to your account'}</p>
-
-        {error && <div className="alert" style={{ backgroundColor: '#fee', color: '#991' }}>{error}</div>}
-        {success && <div className="alert">{success}</div>}
-
-        <form onSubmit={handleAuth} className="form-grid">
-          {isSignup && (
-            <>
-              <div>
-                <label className="label">Full Name</label>
-                <input
-                  className="input"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter your name"
-                  required
-                />
-              </div>
-              <div>
-                <label className="label">I am a</label>
-                <select className="select" value={role} onChange={(e) => setRole(e.target.value)}>
-                  <option value="student">Student</option>
-                  <option value="teacher">Teacher</option>
-                </select>
-              </div>
-            </>
-          )}
-
-          <div>
-            <label className="label">Email Address</label>
-            <input
-              className="input"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="label">Password</label>
-            <input
-              className="input"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              required
-            />
-          </div>
-
-          <div className="form-actions">
-            <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? 'Loading...' : isSignup ? 'Create Account' : 'Sign In'}
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={() => {
-                setIsSignup(!isSignup);
-                setError('');
-                setSuccess('');
-              }}
-            >
-              {isSignup ? 'Have an account?' : 'Need an account?'}
+    <div className="app-shell">
+      <div className="container">
+        <header className="card topbar">
+          <div className="brand">🎓 School Hub</div>
+          <div className="header-actions">
+            <span className="user-pill">{roleLabel} • {userName}</span>
+            <button className="btn btn-secondary" onClick={() => signOut(auth)}>
+              Logout
             </button>
           </div>
-        </form>
+        </header>
+
+        {userRole === 'teacher' && (
+          <TeacherDashboard uid={user.uid} email={user.email} userName={userName} />
+        )}
+
+        {userRole === 'student' && (
+          <StudentDashboard uid={user.uid} email={user.email} userName={userName} />
+        )}
+
+        {userRole === 'parent' && (
+          <ParentDashboard uid={user.uid} email={user.email} userName={userName} />
+        )}
       </div>
     </div>
   );
